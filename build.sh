@@ -7,14 +7,14 @@ MAKE_THREAD_COUNT=0           # The number of threads for make to use
 CPU_COUNT=4                   # The number of CPUs (core) in the system (defaults to 4)
 
 KICAD_DIRECTORY=kicad
-KICAD_BRANCH="lp:~cern-kicad/kicad/testing"
+# KICAD_BRANCH="lp:~cern-kicad/kicad/testing"
 # KICAD_BRANCH="lp:kicad"
-# KICAD_BRANCH="lp:~kicad-testing-committers/kicad/testing"
+KICAD_BRANCH="lp:~kicad-testing-committers/kicad/testing"
 LIBRARY_DIRECTORY=library
 
 WXPYTHON_VERSION_MAJOR=2.9
-# WXPYTHON_VERSION_MINOR=5
-WXPYTHON_VERSION_MINOR=4
+WXPYTHON_VERSION_MINOR=5
+# WXPYTHON_VERSION_MINOR=4
 WXPYTHON_VERSION="${WXPYTHON_VERSION_MAJOR}.${WXPYTHON_VERSION_MINOR}.0"
 WXPYTHON_SOURCE_DIRECTORY=wxPython-src-$WXPYTHON_VERSION
 WXPYTHON_DOWNLOAD_URL=http://downloads.sourceforge.net/project/wxpython/wxPython/$WXPYTHON_VERSION/$WXPYTHON_SOURCE_DIRECTORY.tar.bz2
