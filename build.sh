@@ -5,6 +5,7 @@ BUILD_ARCHITECTURES=()        # The architectures to build for
 BUILD_STEPS=()                # Which steps to build
 MAKE_THREAD_COUNT=0           # The number of threads for make to use
 CPU_COUNT=4                   # The number of CPUs (core) in the system (defaults to 4)
+BZR_REV=""
 
 KICAD_DIRECTORY=kicad
 KICAD_BRANCH="lp:kicad"
@@ -35,7 +36,7 @@ print_usage()
 		echo ""
 	fi
 
-	echo "usage: build.sh [-a|--arch <architecture_string>] [-c|--cpus <cpu_count>] [-d|--debug] [-h|--help]"
+	echo "usage: build.sh [-a|--arch <architecture_string>] [-c|--cpus <cpu_count>] [-d|--debug] [-h|--help] [-r|--revision <revnumber>]"
 	echo ""
 	echo "-a / --arch <architecture_string>: specify an architecture to build. You can specify"
 	echo "                                   multiple instaces of this argument to specify multiple architectures. If this argument"
@@ -52,6 +53,8 @@ print_usage()
 	echo "-s / --steps: <steps>: Select which steps to execute, either a single step number in the range [1-8] or a comma separated"
 	echo "                       list of steps or a step number followed by a comma followed by "..." ( eg. 3,... ). The later"
 	echo "                       syntax executes the step provided plus the following steps up until the last."
+	echo ""
+	echo "-r / --revision: <revnumber>: Select bzr revision number"
 	echo ""
 	echo "-C / --cern-branch : Selects the CERN branch, that includes push&shove router, GAL and new TOOL framework"
 	echo ""
@@ -113,6 +116,13 @@ while [ "$1" != "" ]; do
 		-m | --mrproper )
 		mrproper
 		;;
+
+        # specify bzr revision
+        -r | --revision )
+        shift
+        BZR_REV=$1
+        echo "Setting BZR revision to '$BZR_REV'."
+        ;;
 
 		# Select which steps to execute, either a single step number in the range [1-8] or a comma separated list of steps
 		# or a step number followed by a comma followed by "..." ( eg. 3,... ). The later syntax executes the step provided
@@ -280,6 +290,14 @@ step2()
 
 	test -d $SOURCE_DIRECTORY/$KICAD_DIRECTORY || (cd $SOURCE_DIRECTORY; bzr branch $KICAD_BRANCH $KICAD_DIRECTORY ; cd ..) || exit_on_build_error
 	test -d $SOURCE_DIRECTORY/$KICAD_DIRECTORY && (cd $SOURCE_DIRECTORY/$KICAD_DIRECTORY; bzr pull; cd ..) || exit_on_build_error
+    if [ "$BZR_REV" != "" ]; then
+        echo "Using BZR_REV '$BZR_REV'."
+        test -d $SOURCE_DIRECTORY/$KICAD_DIRECTORY && (cd $SOURCE_DIRECTORY/$KICAD_DIRECTORY; bzr revert -r $BZR_REV; cd ..) || exit_on_build_error
+    fi
+    echo "Applying ${PATCH_DIRECTORY}/kicad_download_boost_cmake.patch in ${SOURCE_DIRECTORY}/${KICAD_DIRECTORY}"
+    cd $SOURCE_DIRECTORY/$KICAD_DIRECTORY 
+    patch -p0 -N < $PATCH_DIRECTORY/kicad_download_boost_cmake.patch
+    cd $SCRIPT_DIRECTORY
 
 	test -d $SOURCE_DIRECTORY/$LIBRARY_DIRECTORY || (cd $SOURCE_DIRECTORY; bzr branch lp:~kicad-lib-committers/kicad/library ; cd ..) || exit_on_build_error
 	test -d $SOURCE_DIRECTORY/$LIBRARY_DIRECTORY && (cd $SOURCE_DIRECTORY/$LIBRARY_DIRECTORY; bzr pull; cd ..) || exit_on_build_error
