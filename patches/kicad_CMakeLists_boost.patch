@@ -1,0 +1,26 @@
+=== modified file 'CMakeLists.txt'
+--- CMakeLists.txt	2013-11-10 19:15:09 +0000
++++ CMakeLists.txt	2013-11-13 19:24:58 +0000
+@@ -270,9 +270,18 @@
+ find_package(Cairo 1.8.1 QUIET)
+ check_find_package_result(CAIRO_FOUND "Cairo")
+ 
+-# Download boost and possibly build parts of it
+-#################################################
+-include( download_boost )
++######################
++# Find Boost library #
++######################
++find_package(Boost REQUIRED COMPONENTS date_time filesystem iostreams locale program_options regex system thread )
++if(Boost_FOUND)
++    check_find_package_result(Boost_FOUND "boost")
++else()
++    ###############################################################
++    # If not found, download boost and possibly build parts of it #
++    ###############################################################
++    include( download_boost )
++endif()
+ 
+ 
+ ##########################
+
