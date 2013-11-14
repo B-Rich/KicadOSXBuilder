@@ -281,10 +281,10 @@ step2()
         test -d $SOURCE_DIRECTORY/$KICAD_DIRECTORY && (cd $SOURCE_DIRECTORY/$KICAD_DIRECTORY; bzr revert -r $BZR_REV; cd ..) || exit_on_build_error
     fi
 
-    echo "Applying ${PATCH_DIRECTORY}/kicad_download_boost_cmake.patch in ${SOURCE_DIRECTORY}/${KICAD_DIRECTORY}"
-    cd $SOURCE_DIRECTORY/$KICAD_DIRECTORY 
-    patch -p0 -N < $PATCH_DIRECTORY/kicad_download_boost_cmake.patch
-    cd $SCRIPT_DIRECTORY
+#     echo "Applying ${PATCH_DIRECTORY}/kicad_download_boost_cmake.patch in ${SOURCE_DIRECTORY}/${KICAD_DIRECTORY}"
+#     cd $SOURCE_DIRECTORY/$KICAD_DIRECTORY 
+#     patch -p0 -N < $PATCH_DIRECTORY/kicad_download_boost_cmake.patch
+#     cd $SCRIPT_DIRECTORY
 
     echo "Applying ${PATCH_DIRECTORY}/kicad_CMakeLists_boost.patch in ${SOURCE_DIRECTORY}/${KICAD_DIRECTORY}"
     cd $SOURCE_DIRECTORY/$KICAD_DIRECTORY 
