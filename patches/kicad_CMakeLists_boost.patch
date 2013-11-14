@@ -8,16 +8,16 @@
 -# Download boost and possibly build parts of it
 -#################################################
 -include( download_boost )
-+######################
-+# Find Boost library #
-+######################
-+find_package(Boost REQUIRED COMPONENTS date_time filesystem iostreams locale program_options regex system thread )
-+if(Boost_FOUND)
++if( APPLE )
++    ######################
++    # Find Boost library #
++    ######################
++    find_package(Boost REQUIRED COMPONENTS date_time filesystem iostreams locale program_options regex system thread )
 +    check_find_package_result(Boost_FOUND "boost")
 +else()
-+    ###############################################################
-+    # If not found, download boost and possibly build parts of it #
-+    ###############################################################
++    #################################################
++    # Download boost and possibly build parts of it #
++    #################################################
 +    include( download_boost )
 +endif()
  
