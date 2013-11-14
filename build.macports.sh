@@ -13,10 +13,10 @@ KICAD_BRANCH="lp:kicad"
 # KICAD_BRANCH="lp:~kicad-testing-committers/kicad/testing"
 LIBRARY_DIRECTORY=library
 
-# WXPYTHON_VERSION_MAJOR=2.9
+# WXPYTHON_RELEASE=2.9
 # WXPYTHON_VERSION_MINOR=5
 # # WXPYTHON_VERSION_MINOR=4
-# WXPYTHON_VERSION="${WXPYTHON_VERSION_MAJOR}.${WXPYTHON_VERSION_MINOR}.0"
+# WXPYTHON_VERSION="${WXPYTHON_RELEASE}.${WXPYTHON_VERSION_MINOR}.0"
 # WXPYTHON_SOURCE_DIRECTORY=wxPython-src-$WXPYTHON_VERSION
 # WXPYTHON_DOWNLOAD_URL=http://downloads.sourceforge.net/project/wxpython/wxPython/$WXPYTHON_VERSION/$WXPYTHON_SOURCE_DIRECTORY.tar.bz2
 
@@ -318,6 +318,7 @@ step4()
     echo "Use wxPython-3.0 from MacPorts."
     echo "    sudo port install wxPython-3.0 +monolithic +universal"
     echo "    sudo port select wxWidgets wxPython-3.0"
+    echo "    sudo port install py27-wxpython-3.0"
 }
 
 step5()
@@ -382,9 +383,10 @@ step6()
 	mkdir -p $BUILD_DIRECTORY/$LIBRARY_DIRECTORY
 	cd $BUILD_DIRECTORY/$LIBRARY_DIRECTORY
 
-	cmake $SOURCE_DIRECTORY/$LIBRARY_DIRECTORY/ -DCMAKE_INSTALL_PREFIX=$PREFIX_DIRECTORY              \
-	                                            -DKICAD_TEMPLATES=$PREFIX_DIRECTORY/share/kicad/template   \
-	                                            -DKICAD_MODULES=$PREFIX_DIRECTORY/share/kicad/modules \
+	cmake $SOURCE_DIRECTORY/$LIBRARY_DIRECTORY/ -DCMAKE_INSTALL_PREFIX=$PREFIX_DIRECTORY                    \
+                                                -DCMAKE_LIBRARY_PATH="/opt/local/lib"                       \
+	                                            -DKICAD_TEMPLATES=$PREFIX_DIRECTORY/share/kicad/template    \
+	                                            -DKICAD_MODULES=$PREFIX_DIRECTORY/share/kicad/modules       \
 	                                            -DKICAD_LIBRARY=$PREFIX_DIRECTORY/share/kicad/library
 	make install
 	cd $SCRIPT_DIRECTORY
@@ -411,22 +413,27 @@ step7()
 	cp $BUILD_DIRECTORY/$KICAD_DIRECTORY/pcbnew/_pcbnew.so 	     $PYTHON_SITE_PKGS
 	cp $BUILD_DIRECTORY/$KICAD_DIRECTORY/pcbnew/pcbnew.py  	     $PYTHON_SITE_PKGS
 
-	cp -RfP $PREFIX_DIRECTORY/lib/libwx_osx_cocoau-${WXPYTHON_VERSION}.0.dylib $FRAMEWORK_LIBS
-	cp -RfP $PREFIX_DIRECTORY/lib/libwx_osx_cocoau_gl-${WXPYTHON_VERSION}.0.dylib $FRAMEWORK_LIBS
+    export WX_PREFIX_DIRECTORY=`wx-config --prefix`
+    export WXPYTHON_VERSION=`wx-config --version`
+    export WXPYTHON_VERSION_FULL=`wx-config --version-full`
+    export WXPYTHON_RELEASE=`wx-config --release`
+	cp -RfP $WX_PREFIX_DIRECTORY/lib/libwx_osx_cocoau-${WXPYTHON_VERSION_FULL}.0.dylib $FRAMEWORK_LIBS
+	cp -RfP $WX_PREFIX_DIRECTORY/lib/libwx_osx_cocoau_gl-${WXPYTHON_VERSION_FULL}.0.dylib $FRAMEWORK_LIBS
 
 	cd $FRAMEWORK_LIBS
-	ln -s libwx_osx_cocoau-${WXPYTHON_VERSION}.0.dylib libwx_osx_cocoau-${WXPYTHON_VERSION_MAJOR}.dylib
-	ln -s libwx_osx_cocoau-${WXPYTHON_VERSION}.0.dylib libwx_osx_cocoau-${WXPYTHON_VERSION_MAJOR}.${WXPYTHON_VERSION_MINOR}.dylib
+	ln -s libwx_osx_cocoau-${WXPYTHON_VERSION_FULL}.0.dylib libwx_osx_cocoau-${WXPYTHON_RELEASE}.dylib
+	ln -s libwx_osx_cocoau-${WXPYTHON_VERSION_FULL}.0.dylib libwx_osx_cocoau-${WXPYTHON_VERSION}.dylib
 
-	ln -s libwx_osx_cocoau_gl-${WXPYTHON_VERSION}.0.dylib libwx_osx_cocoau_gl-${WXPYTHON_VERSION_MAJOR}.dylib
-	ln -s libwx_osx_cocoau_gl-${WXPYTHON_VERSION}.0.dylib libwx_osx_cocoau_gl-${WXPYTHON_VERSION_MAJOR}.${WXPYTHON_VERSION_MINOR}.dylib
+	ln -s libwx_osx_cocoau_gl-${WXPYTHON_VERSION_FULL}.0.dylib libwx_osx_cocoau_gl-${WXPYTHON_RELEASE}.dylib
+	ln -s libwx_osx_cocoau_gl-${WXPYTHON_VERSION_FULL}.0.dylib libwx_osx_cocoau_gl-${WXPYTHON_VERSION}.dylib
 
-	$INSTALL_NAME_TOOL -id $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau-${WXPYTHON_VERSION}.0.dylib $FRAMEWORK_LIBS/libwx_osx_cocoau-${WXPYTHON_VERSION}.0.dylib
-	$INSTALL_NAME_TOOL -id $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau_gl-${WXPYTHON_VERSION}.0.dylib $FRAMEWORK_LIBS/libwx_osx_cocoau_gl-${WXPYTHON_VERSION}.0.dylib
-	$INSTALL_NAME_TOOL -change $PREFIX_DIRECTORY/lib/libwx_osx_cocoau-${WXPYTHON_VERSION}.0.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau-${WXPYTHON_VERSION}.0.dylib $FRAMEWORK_LIBS/libwx_osx_cocoau_gl-${WXPYTHON_VERSION}.0.dylib
+	$INSTALL_NAME_TOOL -id $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau-${WXPYTHON_VERSION_FULL}.0.dylib $FRAMEWORK_LIBS/libwx_osx_cocoau-${WXPYTHON_VERSION_FULL}.0.dylib
+	$INSTALL_NAME_TOOL -id $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau_gl-${WXPYTHON_VERSION_FULL}.0.dylib $FRAMEWORK_LIBS/libwx_osx_cocoau_gl-${WXPYTHON_VERSION_FULL}.0.dylib
+	$INSTALL_NAME_TOOL -change $PREFIX_DIRECTORY/lib/libwx_osx_cocoau-${WXPYTHON_VERSION_FULL}.0.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau-${WXPYTHON_VERSION_FULL}.0.dylib $FRAMEWORK_LIBS/libwx_osx_cocoau_gl-${WXPYTHON_VERSION_FULL}.0.dylib
 
 	cd $SCRIPT_DIRECTORY
-	cp -rf $PREFIX_DIRECTORY/lib/python2.7/site-packages/wx-${WXPYTHON_VERSION_MAJOR}.${WXPYTHON_VERSION_MINOR}-osx_cocoa/wx   $PYTHON_SITE_PKGS
+	export PYTHON_FRAMEWORK_DIR=`python-config --prefix`
+	cp -rf $PYTHON_FRAMEOWRK_DIR/lib/python2.7/site-packages/wx-${WXPYTHON_VERSION}-osx_cocoa/wx   $PYTHON_SITE_PKGS
 
 	for APP in bitmap2component eeschema gerbview pcbnew pcb_calculator kicad cvpcb
 	do
@@ -436,14 +443,14 @@ step7()
 		chmod a+x $PREFIX_DIRECTORY/bin/$APP.app/Contents/MacOS/$APP
 
 		echo "fixing references in $APP"
-		$INSTALL_NAME_TOOL -change $PREFIX_DIRECTORY/lib/libwx_osx_cocoau_gl-${WXPYTHON_VERSION_MAJOR}.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau_gl-${WXPYTHON_VERSION_MAJOR}.dylib $PREFIX_DIRECTORY/bin/$APP.app/Contents/MacOS/$APP.bin
-		$INSTALL_NAME_TOOL -change $PREFIX_DIRECTORY/lib/libwx_osx_cocoau-${WXPYTHON_VERSION_MAJOR}.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau-${WXPYTHON_VERSION_MAJOR}.dylib $PREFIX_DIRECTORY/bin/$APP.app/Contents/MacOS/$APP.bin
+		$INSTALL_NAME_TOOL -change $WX_PREFIX_DIRECTORY/lib/libwx_osx_cocoau_gl-${WXPYTHON_RELEASE}.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau_gl-${WXPYTHON_RELEASE}.dylib $PREFIX_DIRECTORY/bin/$APP.app/Contents/MacOS/$APP.bin
+		$INSTALL_NAME_TOOL -change $WX_PREFIX_DIRECTORY/lib/libwx_osx_cocoau-${WXPYTHON_RELEASE}.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau-${WXPYTHON_RELEASE}.dylib $PREFIX_DIRECTORY/bin/$APP.app/Contents/MacOS/$APP.bin
 	done
 
 	echo "fixing references in wxPython libs"
 
-	find $PREFIX_DIRECTORY -name "*.so" -exec $INSTALL_NAME_TOOL -change $PREFIX_DIRECTORY/lib/libwx_osx_cocoau-${WXPYTHON_VERSION_MAJOR}.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau-${WXPYTHON_VERSION_MAJOR}.dylib {} \;
-	find $PREFIX_DIRECTORY -name "*.so" -exec $INSTALL_NAME_TOOL -change $PREFIX_DIRECTORY/lib/libwx_osx_cocoau_gl-${WXPYTHON_VERSION_MAJOR}.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau_gl-${WXPYTHON_VERSION_MAJOR}.dylib {} \;
+	find $PREFIX_DIRECTORY -name "*.so" -exec $INSTALL_NAME_TOOL -change $WX_PREFIX_DIRECTORY/lib/libwx_osx_cocoau-${WXPYTHON_RELEASE}.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau-${WXPYTHON_RELEASE}.dylib {} \;
+	find $PREFIX_DIRECTORY -name "*.so" -exec $INSTALL_NAME_TOOL -change $WX_PREFIX_DIRECTORY/lib/libwx_osx_cocoau_gl-${WXPYTHON_RELEASE}.dylib $KICAD_FRAMEWORKS_PATH/libwx_osx_cocoau_gl-${WXPYTHON_RELEASE}.dylib {} \;
 
 	cd $SCRIPT_DIRECTORY
 }
