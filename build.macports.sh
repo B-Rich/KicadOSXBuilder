@@ -428,7 +428,7 @@ step7()
 
 	cd $SCRIPT_DIRECTORY
 	export PYTHON_FRAMEWORK_DIR=`python-config --prefix`
-	cp -rf $PYTHON_FRAMEOWRK_DIR/lib/python2.7/site-packages/wx-${WXPYTHON_VERSION}-osx_cocoa/wx   $PYTHON_SITE_PKGS
+	cp -rf $PYTHON_FRAMEWORK_DIR/lib/python2.7/site-packages/wx-${WXPYTHON_VERSION}-osx_cocoa/wx   $PYTHON_SITE_PKGS
 
 	for APP in bitmap2component eeschema gerbview pcbnew pcb_calculator kicad cvpcb
 	do
