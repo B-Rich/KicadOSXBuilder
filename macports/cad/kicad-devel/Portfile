@@ -1,0 +1,52 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+PortSystem          1.0
+name                kicad-devel
+set bzr_rev         4451
+version             0.1-${bzr_rev}
+categories          cad electronics science
+platforms           darwin
+maintainers         nomaintainer
+description         KiCad PCB Tools
+long_description    KiCad is a suite of tools for designing electronics
+homepage            http://www.kicad-pcb.org/
+
+# For reference: https://trac.macports.org/browser/trunk/dports/graphics/inkscape-devel/Portfile
+fetch.type          bzr
+bzr.url             lp:kicad
+bzr.revision        ${bzr_rev}
+# Automatic tarball URL syntax:
+# For Latest: https://bazaar.launchpad.net/~kicad-testing-committers/kicad/testing/tarball
+# For rev 4451: https://bazaar.launchpad.net/~kicad-testing-committers/kicad/testing/tarball/4451
+
+depends_build       port:cmake
+
+depends_lib         port:boost \
+                    port:wxPython-3.0 \
+                    port:py27-wxpython-3.0 \
+                    port:icu \
+                    port:cairo
+
+pre-fetch {
+    ui_msg "---> Fetching source from bzr repository"
+}
+
+configure.cmd        cmake
+
+# For reference: https://trac.macports.org/browser/trunk/dports/graphics/opencv/Portfile
+configure.args      ../${distname}/ \
+                    -DKICAD_TESTING_VERSION=ON \
+                    -DKICAD_SCRIPTING=ON \
+                    -DKICAD_SCRIPTING_MODULES=ON \
+                    -DKICAD_SCRIPTING_WXPYTHON=ON \
+                    -DCMAKE_CXX_FLAGS=-D__ASSERTMACROS__ \
+                    -DCMAKE_ASM_FLAGS="-arch x86_64" \
+                    -DCMAKE_FIND_FRAMEWORK=LAST \
+                    -DCMAKE_OSX_ARCHITECTURES="-arch x86_64" \
+                    -DCMAKE_BUILD_TYPE=Debug
+
+configure {
+    cd ${workdir}
+    ${configure.cmd} ${configure.args} ../${worksrcdir}
+}
+
