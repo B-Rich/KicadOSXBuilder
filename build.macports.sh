@@ -186,12 +186,6 @@ init()
 
 	MAKE_THREAD_COUNT=-j$(($CPU_COUNT*2)) # use twice as many threads as CPUs (cores) are in the system
 
-	mkdir -p $BUILD_DIRECTORY
-	mkdir -p $PREFIX_DIRECTORY
-	mkdir -p $PACKAGE_DIRECTORY
-	mkdir -p $ARCHIVE_DIRECTORY
-	mkdir -p $SOURCE_DIRECTORY
-
 	if [ $BUILD_TYPE = Debug ]; then
 		# WXWIDGETS_ADDITIONAL_FLAGS=--enable-debug
 		KICAD_BUILD_FLAGS="-DCMAKE_BUILD_TYPE=Debug"
@@ -200,6 +194,12 @@ init()
 		PACKAGE_DIRECTORY=$PACKAGE_DIRECTORY-debug
 		REVISION_APPENDIX=-debug
 	fi
+
+	mkdir -p $BUILD_DIRECTORY
+	mkdir -p $PREFIX_DIRECTORY
+	mkdir -p $PACKAGE_DIRECTORY
+	mkdir -p $ARCHIVE_DIRECTORY
+	mkdir -p $SOURCE_DIRECTORY
 
 }
 
@@ -350,8 +350,8 @@ step5()
                                              -DCMAKE_ASM_FLAGS="${CMAKE_ASM_FLAGS}"                            \
 	                                         -DCMAKE_INSTALL_PREFIX=$PREFIX_DIRECTORY                          \
 	                                         -DCMAKE_FIND_FRAMEWORK=LAST                                       \
-	                                         -DPYTHON_EXECUTABLE=`which python`                                \
 	                                         -DwxWidgets_CONFIG_EXECUTABLE=$wxWidgets_ROOT_DIR/bin/wx-config   \
+	                                         -DPYTHON_EXECUTABLE=`which python`                                \
 	                                         -DPYTHON_SITE_PACKAGE_PATH=$PREFIX_DIRECTORY/python/site-packages \
 	                                         -DPYTHON_PACKAGES_PATH=$PREFIX_DIRECTORY/python/site-packages     \
 	                                         -DCMAKE_OSX_ARCHITECTURES="${CMAKE_ARCHITECTURE_STRING}"          \
@@ -378,11 +378,11 @@ step6()
 	mkdir -p $BUILD_DIRECTORY/$LIBRARY_DIRECTORY
 	cd $BUILD_DIRECTORY/$LIBRARY_DIRECTORY
 
-	cmake $SOURCE_DIRECTORY/$LIBRARY_DIRECTORY/ -DCMAKE_INSTALL_PREFIX=$PREFIX_DIRECTORY                    \
-                                                -DCMAKE_LIBRARY_PATH="/opt/local/lib"                       \
-	                                            -DKICAD_TEMPLATES=$PREFIX_DIRECTORY/share/kicad/template    \
-	                                            -DKICAD_MODULES=$PREFIX_DIRECTORY/share/kicad/modules       \
-	                                            -DKICAD_LIBRARY=$PREFIX_DIRECTORY/share/kicad/library
+	cmake $SOURCE_DIRECTORY/$LIBRARY_DIRECTORY/ -DCMAKE_INSTALL_PREFIX=$PREFIX_DIRECTORY              \
+	                                            -DKICAD_TEMPLATES=$PREFIX_DIRECTORY/share/kicad/template   \
+	                                            -DKICAD_MODULES=$PREFIX_DIRECTORY/share/kicad/modules \
+	                                            -DKICAD_LIBRARY=$PREFIX_DIRECTORY/share/kicad/library       \
+                                                -DCMAKE_LIBRARY_PATH="/opt/local/lib"
 	make install
 	cd $SCRIPT_DIRECTORY
 }
@@ -412,6 +412,7 @@ step7()
     export WXPYTHON_VERSION=`wx-config --version`
     export WXPYTHON_VERSION_FULL=`wx-config --version-full`
     export WXPYTHON_RELEASE=`wx-config --release`
+
 	cp -RfP $WX_PREFIX_DIRECTORY/lib/libwx_osx_cocoau-${WXPYTHON_VERSION_FULL}.0.dylib $FRAMEWORK_LIBS
 	cp -RfP $WX_PREFIX_DIRECTORY/lib/libwx_osx_cocoau_gl-${WXPYTHON_VERSION_FULL}.0.dylib $FRAMEWORK_LIBS
 
